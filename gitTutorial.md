@@ -37,5 +37,9 @@ git config --global user.name
 git config --global user.email
 ```
 
-## Typical Commands
+When commiting now for the first time, the `git` software installed on the device will open up and ask for a sign in:
+
+<div style="text-align:center;">
+    <img src="include/git/git_SW_login.png" style="width:50%">
+</div>
 
