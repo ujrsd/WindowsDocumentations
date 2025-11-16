@@ -9,16 +9,33 @@ On a fresh installation of `Windows`, it is necessary to install `git` to share 
     - Sign in with Microsoft
 3. Follow the steps on [github](https://www.github.com) and link it with `VS-Code`.
 
-## Git Login over terminal
-
-When you try to do a commit in git for the first time, it will lead to an error. It will give you the following error:
-
-
-
-## Typical Commands
-
-To use git commands, you need to open a terminal on the top bar. Typical commands used for git are for example:
+Downloading any project will be done over the termianl with the following command:
 
 ```bash
 git clone [LINK OF PROJECT]
 ```
+
+## Git Login over terminal
+
+After downloading a project and doing your first changes of a project, you will try to do a commit. But without any login, `git` will give you the following error:
+
+<div style="text-align:center;">
+    <img src="include/git/git_login_error.png" style="width:50%">
+</div>
+
+This means you need to login with your `github` account over the terminal in `VS-Code`.
+
+```bash
+git config --global user.name [USERNAME]
+git config --global user.email [E-MAIL]
+```
+
+These informations can be verified by using the same commands without an input:
+
+```bash
+git config --global user.name
+git config --global user.email
+```
+
+## Typical Commands
+
