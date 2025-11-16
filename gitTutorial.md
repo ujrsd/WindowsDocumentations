@@ -20,7 +20,7 @@ git clone [LINK OF PROJECT]
 After downloading a project and doing your first changes of a project, you will try to do a commit. But without any login, `git` will give you the following error:
 
 <div style="text-align:center;">
-    <img src="include/git/git_login_error.png" style="width:50%">
+    <img src="include/Git/git_login_error.png" style="width:50%">
 </div>
 
 This means you need to login with your `github` account over the terminal in `VS-Code`.
@@ -40,6 +40,6 @@ git config --global user.email
 When commiting now for the first time, the `git` software installed on the device will open up and ask for a sign in:
 
 <div style="text-align:center;">
-    <img src="include/git/git_SW_login.png" style="width:50%">
+    <img src="include/Git/git_SW_login.png" style="width:50%">
 </div>
 
