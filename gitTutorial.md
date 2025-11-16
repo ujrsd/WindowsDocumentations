@@ -17,13 +17,15 @@ git clone [LINK OF PROJECT]
 
 ## Git Login over terminal
 
-After downloading a project and doing your first changes of a project, you will try to do a commit. But without any login, `git` will give you the following error:
+After downloading a project and doing your first changes in a project, you will try to do a commit. But without any login, `git` will give you the following error:
 
 <div style="text-align:center;">
     <img src="include/Git/git_login_error.png" style="width:50%">
 </div>
 
-This means you need to login with your `github` account over the terminal in `VS-Code`.
+This means you need to give `git` a username and an e-mail. To do this, open the terminal and use the following commands:
+
+> INSERT WARNING SYMBOL HERE: Values in between [ ] are inputs done by you.
 
 ```bash
 git config --global user.name [USERNAME]
@@ -37,9 +39,10 @@ git config --global user.name
 git config --global user.email
 ```
 
-When commiting now for the first time, the `git` software installed on the device will open up and ask for a sign in:
+Now, when commiting for the first time, the `git` software installed on the device will open up and ask for a sign in:
 
 <div style="text-align:center;">
     <img src="include/Git/git_SW_login.png" style="width:50%">
 </div>
 
+Follow these steps on your webbrowser and afterwards git is fully functional.
