@@ -18,7 +18,9 @@ Partitions can be used to have virtual seperations on your storage system. For e
 
 ## 2. Tutorial
 
-The following tutorial will explain how to remove partitions on a working `Windows 10` device. If the PC will be set up with a new OS, partitions can already be made or removed in the OS-installation. This tutorial will be below this one (TODO).
+The following tutorial will explain how to remove partitions on a working `Windows 10` device. While doing a new OS installation, the `Windows`-Setup gives the same options as the `Disk managment` software. Different partions will be shown and can be created or removed.
+
+> ⚠️ Deleting partitions lead to a full remove of all data!
 
 0. Open `disk management` by pressing the <img src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Windows_logo_-_2012.svg" width="18" style="vertical-align:middle; position:relative; top:-2px; margin:0 3px;"> and type into the search "Disk Management".
 
@@ -54,6 +56,10 @@ The following tutorial will explain how to remove partitions on a working `Windo
     <img src="include/extend_volume.png" style="width:80%">
 </div>
 
+5. Extending the maximum amount of MB possible will lead to the following result:
+
 <div style="text-align:center;">
     <img src="include/result.png" style="width:95%">
 </div>
+
+In this case, Disk 0 results in the EFI, Data and Recovery partition that will be present of a data storage with a `Windows` installment. Disks without an OS will be a full data partition if no partitions were made for it.
