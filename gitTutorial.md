@@ -25,7 +25,7 @@ After downloading a project and doing your first changes in a project, you will 
 
 This means you need to give `git` a username and an e-mail. To do this, open the terminal and use the following commands:
 
-> INSERT WARNING SYMBOL HERE: Values in between [ ] are inputs done by you.
+> ⚠️ Values in between **[ ]** are inputs done by you.
 
 ```bash
 git config --global user.name [USERNAME]
