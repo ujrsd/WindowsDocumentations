@@ -47,3 +47,20 @@ To give the `PowerShell` permission, the following command needs to added:
 ```bash
 powershell -ExecutionPolicy Bypass -File "autoInstaller.ps1" 
 ```
+
+## PowerShell
+
+To install a package, the following command is used:
+
+```PowerShell
+winget install [PACKAGE_NAME]
+winget install Mozilla.FireFox
+```
+
+A better approach is to use `-e` and `--id` so that `winget` uses the exact installation ID:
+
+```PowerShell
+winget install -e --id Mozilla.FireFox
+```
+
+On the website https://winstall.app/apps or https://winget.run/ you can find any installable app with the `winget` function of the `PowerShell`.
