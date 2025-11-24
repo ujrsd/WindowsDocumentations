@@ -18,19 +18,19 @@ $browsers = @("Mozilla.Firefox",
 
 install_packages -PackageIDs $browsers
 
-Write-Host "Browser Installation completed, this will finish the current script for testing!"
-Read-Host "Press Enter to continue ..."
-exit
+
 
 # Gaming
 $game_services = @("Valve.Steam",
                 "EpicGames.EpicGamesLauncher",
-                "ElectronicArts.EADekstop",
+                "ElectronicArts.EADesktop",
                 "Ubisoft.Connect")
 
-foreach($game_service in $game_services) {
-    winget install -e --id $game_service --accept-source-agreements --accept-package-agreements
-}
+install_packages -PackageIDs $game_services
+
+Write-Host "Browser Installation completed, this will finish the current script for testing!"
+Read-Host "Press Enter to continue ..."
+exit
 
 # VPNs
 $VPNs = @("NordSecurity.NordVPN",
@@ -98,9 +98,6 @@ $nvidia_softwares = @("Nvidia.GeForceNow")
 foreach($nvidia_software in $nvidia_softwares) {
     winget install -e --id $nvidia_software --accept-source-agreements --accept-package-agreements
 }
-
-
-
 
 #winget install Google.Chrome --accept-source-agreements --accept-package-agreements
 

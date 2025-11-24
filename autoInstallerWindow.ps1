@@ -1,29 +1,103 @@
 Add-Type -AssemblyName System.Windows.Forms
 
-# Create the form
-$form = New-Object System.Windows.Forms.Form
-$form.Text = "App Installer Wizard"
+# Initialize Constants
 $Screen_resolution = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-$form.Size = New-Object System.Drawing.Size(
-    [int]($Screen_resolution.Width * 0.4),
-    [int]($Screen_resolution.Height * 0.6)
-)
-$form.StartPosition = "CenterScreen"
+$Screen_width =[int]($Screen_resolution.Width*0.5) 
+$Screen_height =[int]($Screen_resolution.Height*0.65)
 
-# Relative coordinates
+$deltaX = 10
+$deltaY = 10
+
+$columns = 3
+$column_width = [int](($Screen_width / $columns)-$deltaX) 
+
+Write-Host "column_width = " $column_width
+
+
+## Relative coordinates
 $yPos = 10
 $xPos = 10
 
+function add_Line{
+    param(
+        $x, $y, $height, $width, [string]$color = "Gray"
+    )
+
+    $line = New-Object System.Windows.Forms.Label
+    $line.BorderStyle = "Fixed3D"
+    $line.AutoSize = $false
+    $line.Height = $height
+    $line.Width  = $width
+    $line.Location = New-Object System.Drawing.Point($x, $y)
+    $line.BackColor = [System.Drawing.Color]::$color
+    $form.Controls.Add($line)
+}
+
+function increaseYPos {
+    param (
+        $y, $object_height
+    )
+
+    Write-Host "deltaY =" $deltaY "yMax =" $yMax
+    Write-Host "Before: yPos =" $yPos
+
+    $y += $object_height + $deltaY
+
+    if ($y -ge $yMax) {
+        $y = 0
+    }
+
+    Write-Host "After: yPos =" $yPos
+    
+    return $y
+}
+
+
+Write-Host "Screen width:" $Screen_width
+# Create the form
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "App Installer Wizard"
+$form.Size = New-Object System.Drawing.Size(
+    $Screen_width,
+    $Screen_height
+)
+$form.StartPosition = "CenterScreen"
+$form.FormBorderStyle = "FixedSingle"
+
+# Install button
+$btn_install = New-Object System.Windows.Forms.Button
+$btn_install.Text = "Install Selected Apps"
+$btn_install.Width = [int]($form.ClientSize.Width*(0.33))
+$btn_install.Height = [int]($form.ClientSize.Height*(0.05))
+$btn_install.Location = New-Object System.Drawing.Point(
+    [int](($form.ClientSize.Width - $btn_install.Width) / 2),
+    [int]($form.ClientSize.Height - $btn_install.Height - 20)
+)
+## Add install button to Form
+$form.Controls.Add($btn_install)
+
+add_Line -x $xPos -y ($btn_install.Location.Y-2*$deltaY) -height 3 -width ($Screen_width-4*$deltaX) -color "black"
+
+
+$yMax = $Screen_height - $btn_install.Height - 30
+
 # Create a label
-$xSize = 300
-$ySize = 30
 $label = New-Object System.Windows.Forms.Label
-$label.Text = "Which applications do you want to install on your device? Fill out the check list and press then the install button"
-$label.Size = New-Object System.Drawing.Size($xSize,$ySize)
+$label.Text = "Which applications do you want to install on your device? Fill out the check list and press then the install button."
+$label.AutoSize = $true
+$label.MinimumSize = New-Object System.Drawing.Size([int]($Screen_width - 2*$deltaX),0)
 $label.Location = New-Object System.Drawing.Point($xPos,$yPos)
 $form.Controls.Add($label)
 
-$yPos += $ySize + 5
+$yPos = increaseYPos -y $yPos -object_height $label.Height
+Write-Host "After function: yPos =" $yPos
+
+Write-Host $Screen_width
+Write-Host ($Screen_width - 2*$deltaX)
+Write-Host $label.Width
+
+add_Line -x $xPos -y $yPos -height 3 -width ($label.Width-2*$deltaX) -color "black"
+$yPos = increaseYPos -y $yPos -object_height $line.Height
 
 # Browser
 ## Label
@@ -60,27 +134,15 @@ foreach($browserName in $browsers.Keys) {
     $yPos += 30
 }
 
-# Install button
-$btn_install = New-Object System.Windows.Forms.Button
-$btn_install.Text = "Install Selected Apps"
-$btn_install.Width = [int]($form.ClientSize.Width*(0.33))
-$btn_install.Height = [int]($form.ClientSize.Height*(0.05))
-$btn_install.Location = New-Object System.Drawing.Point(
-    [int](($form.ClientSize.Width - $btn_install.Width) / 2),
-    [int]($form.ClientSize.Height - $btn_install.Height - 20)
-)
 
-## Add install button to Form
-$form.Controls.Add($btn_install)
 
-# Line
-$line = New-Object System.Windows.Forms.Label
-$line.BorderStyle = "Fixed3D"
-$line.AutoSize = $false
-$line.Height = 2
-$line.Width  = $form.ClientSize.Width - 40
-$line.Location = New-Object System.Drawing.Point(310, 10)
-$form.Controls.Add($line)
+# Create a line
+add_Line -x $xPos -y $yPos -height 2 -width 100
+$yPos += $deltaY
+
+add_Line -x $xPos -y $yPos -height 2 -width 100
+
+
 
 # Show the form
 $form.Add_Shown({$form.Activate()})
