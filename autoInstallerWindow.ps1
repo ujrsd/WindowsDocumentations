@@ -8,8 +8,11 @@ $Screen_height =[int]($Screen_resolution.Height*0.65)
 $deltaX = 10
 $deltaY = 10
 
+$yMin = 0
+$yMax = $Screen_width
+
 $columns = 3
-$column_width = [int](($Screen_width / $columns)-$deltaX) 
+$column_width = [int](($Screen_width / $columns)-2*$deltaX) 
 
 Write-Host "column_width = " $column_width
 
@@ -31,29 +34,67 @@ function add_Line{
     $line.Location = New-Object System.Drawing.Point($x, $y)
     $line.BackColor = [System.Drawing.Color]::$color
     $form.Controls.Add($line)
+
+    increaseYPos -object_height $line.Height
+}
+
+function checkYPos {
+    param (
+        $object_height, $deltaY = $script:deltaY
+    )
+
+    $value = $script:yPos + $object_height + $deltaY
+    if ($value -ge $yMax) {
+        $script:yPos = $yMin
+        $script:xPos += $column_width + $deltaX
+    }
 }
 
 function increaseYPos {
     param (
-        $y, $object_height
+        $object_height, $deltaY = $script:deltaY
     )
 
-    Write-Host "deltaY =" $deltaY "yMax =" $yMax
-    Write-Host "Before: yPos =" $yPos
+    $script:yPos += $object_height + $deltaY
+    if ($yPos -ge $yMax) {
+        $script:yPos = $yMin
+        $script:xPos += $column_width + $deltaX
+    }    
+}
 
-    $y += $object_height + $deltaY
+function createCheckBoxes{
+    param (
+        [string]$class_name, $class_list
+    )
 
-    if ($y -ge $yMax) {
-        $y = 0
+    $deltaY = 0.5*$script:deltaY
+
+    $label = New-Object System.Windows.Forms.Label
+    $label.Text = $class_name
+    $label.MinimumSize = New-Object System.Drawing.Size($column_width,0)
+    checkYPos -object_height $label.Height -deltaY $deltaY
+    $label.Location = New-Object System.Drawing.Point($script:xPos,$script:yPos)
+    $form.Controls.Add($label)
+    $script:yPos += $label.Height + $deltaY
+    Write-Host "yPos after label: " $script:yPos
+  
+    foreach($object in $class_list.Keys) {
+        $cb = New-Object System.Windows.Forms.CheckBox
+        $cb.Text = $object
+        $cb.Tag = $class_list[$object]
+        $cb.Size = New-Object System.Drawing.Size($column_width,20)
+        checkYPos -object_height $cb.Height -deltaY $deltaY
+        $cb.Location = New-Object System.Drawing.Point($script:xPos,$script:yPos)
+        $form.Controls.Add($cb)
+        $checkboxes[$object] = $cb
+
+        $script:yPos += $cb.Height + $deltaY
     }
 
-    Write-Host "After: yPos =" $yPos
-    
-    return $y
+    add_Line -x $xPos -y $yPos -height 2 -width $column_width
 }
 
 
-Write-Host "Screen width:" $Screen_width
 # Create the form
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "App Installer Wizard"
@@ -63,6 +104,19 @@ $form.Size = New-Object System.Drawing.Size(
 )
 $form.StartPosition = "CenterScreen"
 $form.FormBorderStyle = "FixedSingle"
+
+# Create a label
+$label = New-Object System.Windows.Forms.Label
+$label.Text = "Which applications do you want to install on your device? Fill out the check list and press then the install button."
+$label.AutoSize = $true
+$label.MinimumSize = New-Object System.Drawing.Size([int]($Screen_width - 2*$deltaX),0)
+$label.Location = New-Object System.Drawing.Point($xPos,$yPos)
+$form.Controls.Add($label)
+
+increaseYPos -object_height $label.Height
+add_Line -x $xPos -y $yPos -height 3 -width ($label.Width-2*$deltaX) -color "black"
+
+$yMin = $yPos
 
 # Install button
 $btn_install = New-Object System.Windows.Forms.Button
@@ -77,41 +131,19 @@ $btn_install.Location = New-Object System.Drawing.Point(
 $form.Controls.Add($btn_install)
 
 add_Line -x $xPos -y ($btn_install.Location.Y-2*$deltaY) -height 3 -width ($Screen_width-4*$deltaX) -color "black"
+$yPos -= $deltaY - $line.Height
 
+# yMax is set after the initalization of the install button
+Write-Host "($btn_install.Location.Y-2*$deltaY) =" ($btn_install.Location.Y-2*$deltaY) " deltaY =" $deltaY
+$yMax = ($btn_install.Location.Y-2*$deltaY) - $deltaY
 
-$yMax = $Screen_height - $btn_install.Height - 30
+Write-Host "yMin =" $yMin
+Write-Host "yMax =" $yMax
 
-# Create a label
-$label = New-Object System.Windows.Forms.Label
-$label.Text = "Which applications do you want to install on your device? Fill out the check list and press then the install button."
-$label.AutoSize = $true
-$label.MinimumSize = New-Object System.Drawing.Size([int]($Screen_width - 2*$deltaX),0)
-$label.Location = New-Object System.Drawing.Point($xPos,$yPos)
-$form.Controls.Add($label)
+#### Create every programm section ####
 
-$yPos = increaseYPos -y $yPos -object_height $label.Height
-Write-Host "After function: yPos =" $yPos
+$checkboxes = @{}
 
-Write-Host $Screen_width
-Write-Host ($Screen_width - 2*$deltaX)
-Write-Host $label.Width
-
-add_Line -x $xPos -y $yPos -height 3 -width ($label.Width-2*$deltaX) -color "black"
-$yPos = increaseYPos -y $yPos -object_height $line.Height
-
-# Browser
-## Label
-$xSize = 300
-$ySize = 20
-$label = New-Object System.Windows.Forms.Label
-$label.Text = "Browsers"
-$label.Size = New-Object System.Drawing.Size($xSize,$ySize)
-$label.Location = New-Object System.Drawing.Point($xPos,$yPos)
-$form.Controls.Add($label)
-
-$yPos += $ySize + 5
-
-# Browser to install
 $browsers = @{
     "Brave Browser" = "Brave.Brave"
     "Google Chrome" = "Google.Chrome"
@@ -119,30 +151,75 @@ $browsers = @{
     "Opera" = "Opera.Opera"
     "Opera GX" = "Opera.OperaGX"
 }
+createCheckBoxes -class_name "Browsers" -class_list $browsers
 
-# Create Checkboxes
-$checkboxes = @{}
-
-foreach($browserName in $browsers.Keys) {
-    $cb = New-Object System.Windows.Forms.CheckBox
-    $cb.Text = $browserName
-    $cb.Tag = $browsers[$browserName]
-    $cb.Size = New-Object System.Drawing.Size(300,20)
-    $cb.Location = New-Object System.Drawing.Point(10,$yPos)
-    $form.Controls.Add($cb)
-    $checkboxes[$browserName] = $cb
-    $yPos += 30
+$VPNs = @{
+    "Nord VPN" = "NordSecurity.NordVPN"
+    "Proton VPN" = "Proton.ProtonVPN"
+    "Express VPN" = "ExpressVPN.ExpressVPN"
 }
+createCheckBoxes -class_name "VPN" -class_list $VPNs
+
+$game_services = @{
+    "Steam" = "Valve.Steam"
+    "Epic Games" = "EpicGames.EpicGamesLauncher"
+    "EA App" = "ElectronicArts.EADesktop"
+    "Ubisoft Connect" = "Ubisoft.Connect"
+}
+createCheckBoxes -class_name "Game Services" -class_list $game_services
+
+$cloud_services = @{
+    "Microsoft Onedrive" = "Microsoft.OneDrive"
+    "Google Drive" = "Google.GoogleDrive"
+    "Dropbox" = "Dropbox.Dopbox"
+}
+createCheckBoxes -class_name "Cloud Services" -class_list $cloud_services
+
+$programming_services = @{
+    "Notepad++" = "Notepad++.Notepad++"
+    "Python3" = "Python.Python3"
+    "Microsoft Visual Studio Code" = "Microsoft.VisualStudioCode"
+    "Microsoft Visual Studio Community" = "Microsoft.VisualStudio.Community"
+}
+createCheckBoxes -class_name "Programming Services" -class_list $programming_services
+
+$util_services = @{
+    "7-Zip" = "7zip.7zip"
+    "Git" = "Git.Git"
+    "Microsoft Power Toys" = "Microsoft.PowerToys"
+    "VLC Video Player" = "VideoLAN.VLC"
+    "Discord" = "Discord.Discord"
+    "OBS" = "OBSProject.OBSStudio"
+    "Spotify" = "Spotify.Spotify"
+}
+createCheckBoxes -class_name "Utils" -class_list $util_services
+
+$office_services = @{
+    "Microsoft Office" = "Microsoft.Office"
+    "Microsoft Teams" = "Microsoft.Teams"
+    "Zoom" = "Zoom.Zoom"
+    "Libre Office" = "TheDocumentFoundation.LibreOffice"
+    "Adobe Acrobat Reader" = "Adobe.Acrobat.Reader.64-bit"
+}
+createCheckBoxes -class_name "Office Services" -class_list $office_services
+
+$graphic_services = @{
+    "Nvidia GeForce Now" = "Nvidia.GeForceNow"
+}
+createCheckBoxes -class_name "Graphics software" -class_list $graphic_services
+
+$email_services = @{
+    "Mozilla Thunderbird" = "Mozilla.Thunderbird"
+}
+createCheckBoxes -class_name "E-Mail services" -class_list $email_services
 
 
 
-# Create a line
-add_Line -x $xPos -y $yPos -height 2 -width 100
-$yPos += $deltaY
-
-add_Line -x $xPos -y $yPos -height 2 -width 100
 
 
+
+
+#### Display the window ####
 
 # Show the form
 $form.Add_Shown({$form.Activate()})
